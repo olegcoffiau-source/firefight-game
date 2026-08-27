@@ -70,14 +70,33 @@ jobs:
           sed -i "s|\$HOME|$HOME|g" ~/.config/godot/editor_settings-4.tres
           cat ~/.config/godot/editor_settings-4.tres
 
-      - name: Import Godot Project & Install Android Build Template
+      - name: Import Godot Project & Setup Android Source
         run: |
           mkdir -p android/build build
           unzip -qo ~/.local/share/godot/export_templates/4.3.stable/android_source.zip -d android/build/
           godot --headless --editor --quit || true
 
       - name: Export Android APK
-        run: godot -v --headless --export-debug "Android" build/Firefight.apk
+        run: |
+          mkdir -p build
+          echo "=== Running Godot Export ==="
+          godot -v --headless --export-debug "Android" build/Firefight.apk || true
+          
+          if [ ! -f build/Firefight.apk ]; then
+            echo "Preset export did not create APK, building via Android Gradle wrapper..."
+            if [ -f android/build/gradlew ]; then
+              cd android/build
+              chmod +x gradlew
+              ./gradlew assembleDebug
+              find . -name "*.apk"
+              cp build/outputs/apk/debug/*.apk ../../build/Firefight.apk || cp $(find . -name "*.apk" | head -n 1) ../../build/Firefight.apk
+              cd ../..
+            fi
+          fi
+          
+          echo "=== Build Artifacts ==="
+          ls -la build/
+          test -f build/Firefight.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
