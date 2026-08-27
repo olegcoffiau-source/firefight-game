@@ -72,9 +72,9 @@ jobs:
 
       - name: Import Godot Project & Install Android Build Template
         run: |
-          mkdir -p build
+          mkdir -p android/build build
+          unzip -qo ~/.local/share/godot/export_templates/4.3.stable/android_source.zip -d android/build/
           godot --headless --editor --quit || true
-          godot --headless --android-install-build-template || true
 
       - name: Export Android APK
         run: godot -v --headless --export-debug "Android" build/Firefight.apk
