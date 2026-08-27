@@ -1,0 +1,252 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle.gd" id="1_battle"]
+[ext_resource type="PackedScene" path="res://scenes/camera.tscn" id="2_cam"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3_hud"]
+[ext_resource type="Texture2D" path="res://assets/terrain/grass_field.png" id="4_grass"]
+[ext_resource type="Texture2D" path="res://assets/terrain/road_straight_h.png" id="5_road"]
+[ext_resource type="Texture2D" path="res://assets/terrain/road_cross.png" id="6_cross"]
+[ext_resource type="Texture2D" path="res://assets/terrain/bomb_crater.png" id="7_crater"]
+[ext_resource type="Texture2D" path="res://assets/terrain/trench_section.png" id="8_trench"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/tree_oak_large.png" id="9_oak"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/tree_pine_large.png" id="10_pine"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/bush_large.png" id="11_bush"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/wood_logs_1.png" id="12_logs"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/ruined_wall.png" id="13_wall"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/ruined_house_bunker.png" id="14_house"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/sandbag_bunker.png" id="15_bunker"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/hedgehog.png" id="16_hedge"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barbed_wire.png" id="17_wire"]
+
+[node name="Battle" type="Node2D"]
+script = ExtResource("1_battle")
+
+[node name="Terrain" type="Node2D" parent="."]
+
+[node name="GrassField" type="TextureRect" parent="Terrain"]
+offset_right = 3200.0
+offset_bottom = 2000.0
+texture = ExtResource("4_grass")
+stretch_mode = 1
+
+[node name="RoadMain" type="TextureRect" parent="Terrain"]
+modulate = Color(0.9, 0.9, 0.9, 0.95)
+offset_top = 920.0
+offset_right = 3200.0
+offset_bottom = 1060.0
+texture = ExtResource("5_road")
+stretch_mode = 1
+
+[node name="RoadCrossNorth" type="TextureRect" parent="Terrain"]
+modulate = Color(0.9, 0.9, 0.9, 0.95)
+offset_left = 1500.0
+offset_top = 0.0
+offset_right = 1680.0
+offset_bottom = 2000.0
+texture = ExtResource("6_cross")
+stretch_mode = 1
+
+[node name="Craters" type="Node2D" parent="Terrain"]
+
+[node name="Crater1" type="Sprite2D" parent="Terrain/Craters"]
+position = Vector2(1100, 650)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("7_crater")
+
+[node name="Crater2" type="Sprite2D" parent="Terrain/Craters"]
+position = Vector2(2100, 1350)
+scale = Vector2(0.85, 0.85)
+texture = ExtResource("7_crater")
+
+[node name="Crater3" type="Sprite2D" parent="Terrain/Craters"]
+position = Vector2(1600, 980)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("7_crater")
+
+[node name="Crater4" type="Sprite2D" parent="Terrain/Craters"]
+position = Vector2(850, 1400)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("7_crater")
+
+[node name="Crater5" type="Sprite2D" parent="Terrain/Craters"]
+position = Vector2(2450, 580)
+scale = Vector2(0.65, 0.65)
+texture = ExtResource("7_crater")
+
+[node name="Trenches" type="Node2D" parent="Terrain"]
+
+[node name="TrenchSoviet1" type="Sprite2D" parent="Terrain/Trenches"]
+position = Vector2(650, 600)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("8_trench")
+
+[node name="TrenchSoviet2" type="Sprite2D" parent="Terrain/Trenches"]
+position = Vector2(650, 1380)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("8_trench")
+
+[node name="TrenchGerman1" type="Sprite2D" parent="Terrain/Trenches"]
+position = Vector2(2550, 600)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("8_trench")
+
+[node name="TrenchGerman2" type="Sprite2D" parent="Terrain/Trenches"]
+position = Vector2(2550, 1380)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("8_trench")
+
+[node name="Props" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="RuinedVillageHouse" type="Sprite2D" parent="Props"]
+position = Vector2(1600, 480)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("14_house")
+
+[node name="SandbagBunker1" type="Sprite2D" parent="Props"]
+position = Vector2(1380, 520)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("15_bunker")
+
+[node name="SandbagBunker2" type="Sprite2D" parent="Props"]
+position = Vector2(1820, 520)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("15_bunker")
+
+[node name="RuinedWall1" type="Sprite2D" parent="Props"]
+position = Vector2(1600, 1450)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("13_wall")
+
+[node name="RuinedWall2" type="Sprite2D" parent="Props"]
+position = Vector2(1200, 1150)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("13_wall")
+
+[node name="RuinedWall3" type="Sprite2D" parent="Props"]
+position = Vector2(2000, 1150)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("13_wall")
+
+[node name="Obstacles" type="Node2D" parent="Props"]
+
+[node name="Hedgehog1" type="Sprite2D" parent="Props/Obstacles"]
+position = Vector2(1480, 990)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("16_hedge")
+
+[node name="Hedgehog2" type="Sprite2D" parent="Props/Obstacles"]
+position = Vector2(1720, 990)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("16_hedge")
+
+[node name="Wire1" type="Sprite2D" parent="Props/Obstacles"]
+position = Vector2(1350, 1030)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("17_wire")
+
+[node name="Wire2" type="Sprite2D" parent="Props/Obstacles"]
+position = Vector2(1850, 1030)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("17_wire")
+
+[node name="ForestNorthWest" type="Node2D" parent="Props"]
+
+[node name="Oak1" type="Sprite2D" parent="Props/ForestNorthWest"]
+position = Vector2(400, 320)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("9_oak")
+
+[node name="Oak2" type="Sprite2D" parent="Props/ForestNorthWest"]
+position = Vector2(560, 260)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("9_oak")
+
+[node name="Pine1" type="Sprite2D" parent="Props/ForestNorthWest"]
+position = Vector2(280, 220)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("10_pine")
+
+[node name="Bush1" type="Sprite2D" parent="Props/ForestNorthWest"]
+position = Vector2(480, 360)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("11_bush")
+
+[node name="Logs1" type="Sprite2D" parent="Props/ForestNorthWest"]
+position = Vector2(340, 380)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("12_logs")
+
+[node name="ForestSouthWest" type="Node2D" parent="Props"]
+
+[node name="Oak3" type="Sprite2D" parent="Props/ForestSouthWest"]
+position = Vector2(420, 1680)
+scale = Vector2(0.52, 0.52)
+texture = ExtResource("9_oak")
+
+[node name="Pine2" type="Sprite2D" parent="Props/ForestSouthWest"]
+position = Vector2(580, 1740)
+scale = Vector2(0.48, 0.48)
+texture = ExtResource("10_pine")
+
+[node name="Bush2" type="Sprite2D" parent="Props/ForestSouthWest"]
+position = Vector2(300, 1620)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("11_bush")
+
+[node name="ForestNorthEast" type="Node2D" parent="Props"]
+
+[node name="Pine3" type="Sprite2D" parent="Props/ForestNorthEast"]
+position = Vector2(2750, 280)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("10_pine")
+
+[node name="Oak4" type="Sprite2D" parent="Props/ForestNorthEast"]
+position = Vector2(2900, 340)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("9_oak")
+
+[node name="Bush3" type="Sprite2D" parent="Props/ForestNorthEast"]
+position = Vector2(2650, 360)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("11_bush")
+
+[node name="ForestSouthEast" type="Node2D" parent="Props"]
+
+[node name="Oak5" type="Sprite2D" parent="Props/ForestSouthEast"]
+position = Vector2(2700, 1680)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("9_oak")
+
+[node name="Pine4" type="Sprite2D" parent="Props/ForestSouthEast"]
+position = Vector2(2880, 1720)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("10_pine")
+
+[node name="Bush4" type="Sprite2D" parent="Props/ForestSouthEast"]
+position = Vector2(2600, 1620)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("11_bush")
+
+[node name="ForestCenter" type="Node2D" parent="Props"]
+
+[node name="Oak6" type="Sprite2D" parent="Props/ForestCenter"]
+position = Vector2(1350, 1650)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("9_oak")
+
+[node name="Pine5" type="Sprite2D" parent="Props/ForestCenter"]
+position = Vector2(1850, 1650)
+scale = Vector2(0.52, 0.52)
+texture = ExtResource("10_pine")
+
+[node name="Bush5" type="Sprite2D" parent="Props/ForestCenter"]
+position = Vector2(1600, 1720)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("11_bush")
+
+[node name="Units" type="Node2D" parent="."]
+
+[node name="Camera2D" parent="." instance=ExtResource("2_cam")]
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]

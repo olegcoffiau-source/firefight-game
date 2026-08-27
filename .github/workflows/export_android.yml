@@ -1,0 +1,52 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  export_android:
+    name: Export Android APK
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3.0
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Android Keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 -deststoretype pkcs12
+          cp debug.keystore /root/.android/debug.keystore || true
+
+      - name: Setup Godot Android Export Templates
+        run: |
+          mkdir -p /root/.local/share/godot/export_templates/4.3.stable/
+          cp -r /root/.local/share/godot/templates/4.3.stable/* /root/.local/share/godot/export_templates/4.3.stable/ || true
+
+      - name: Create Build Directory
+        run: |
+          mkdir -p build/
+
+      - name: Export APK with Godot
+        run: |
+          godot -v --headless --export-debug "Android" build/Firefight.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Firefight-Android-APK
+          path: build/Firefight.apk
+          retention-days: 30
+
+      - name: Create GitHub Release (if tagged)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/Firefight.apk
+          generate_release_notes: true
