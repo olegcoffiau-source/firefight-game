@@ -28,8 +28,10 @@ jobs:
           cp debug.keystore "$HOME/.android/debug.keystore" || true
           sh scripts/setup_ci.sh
 
-      - name: Create Build Directory
-        run: mkdir -p build/
+      - name: Create Build Directory & Import Project
+        run: |
+          mkdir -p build/
+          godot --headless --editor --quit || true
 
       - name: Export APK with Godot
         run: godot -v --headless --export-debug "Android" build/Firefight.apk
