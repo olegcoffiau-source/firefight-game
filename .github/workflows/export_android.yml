@@ -18,16 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Android Keystore
+      - name: Setup Android Keystore & Templates
         run: |
-          mkdir -p ~/.android
-          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 -deststoretype pkcs12
+          mkdir -p /root/.android
+          if [ ! -f debug.keystore ]; then
+            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 -deststoretype pkcs12
+          fi
           cp debug.keystore /root/.android/debug.keystore || true
-
-      - name: Setup Godot Android Export Templates
-        run: |
+          
           mkdir -p /root/.local/share/godot/export_templates/4.3.stable/
-          cp -r /root/.local/share/godot/templates/4.3.stable/* /root/.local/share/godot/export_templates/4.3.stable/ || true
+          mkdir -p /root/.local/share/godot/templates/4.3.stable/
+          if [ -d /root/.local/share/godot/templates/4.3.stable ]; then
+            cp -rn /root/.local/share/godot/templates/4.3.stable/* /root/.local/share/godot/export_templates/4.3.stable/ 2>/dev/null || true
+          fi
+          if [ -d /root/.local/share/godot/export_templates/4.3.stable ]; then
+            cp -rn /root/.local/share/godot/export_templates/4.3.stable/* /root/.local/share/godot/templates/4.3.stable/ 2>/dev/null || true
+          fi
 
       - name: Create Build Directory
         run: |
