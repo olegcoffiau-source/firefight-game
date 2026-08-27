@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Android Keystore & Templates
+      - name: Setup Android Keystore & Environment
         run: |
           mkdir -p /root/.android "$HOME/.android"
           if [ ! -f debug.keystore ]; then
@@ -26,68 +26,13 @@ jobs:
           fi
           cp debug.keystore /root/.android/debug.keystore || true
           cp debug.keystore "$HOME/.android/debug.keystore" || true
-          
-          # Copy export templates to all possible locations including $HOME (/github/home)
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable/"
-          mkdir -p "$HOME/.local/share/godot/templates/4.3.stable/"
-          mkdir -p /root/.local/share/godot/export_templates/4.3.stable/
-          mkdir -p /root/.local/share/godot/templates/4.3.stable/
-          
-          for d in /root/.local/share/godot/templates/4.3.stable /root/.local/share/godot/export_templates/4.3.stable /usr/local/share/godot/templates/4.3.stable; do
-            if [ -d "$d" ]; then
-              cp -rn "$d"/* "$HOME/.local/share/godot/export_templates/4.3.stable/" 2>/dev/null || true
-              cp -rn "$d"/* "$HOME/.local/share/godot/templates/4.3.stable/" 2>/dev/null || true
-              cp -rn "$d"/* /root/.local/share/godot/export_templates/4.3.stable/ 2>/dev/null || true
-            fi
-          done
-
-          # Dynamically detect Java and Android SDK paths
-          JAVA_BIN=$(which javac 2>/dev/null || which java 2>/dev/null || echo "/usr/bin/javac")
-          JAVA_REAL=$(readlink -f "$JAVA_BIN")
-          JAVA_DIR=$(dirname $(dirname "$JAVA_REAL"))
-          
-          APK_SIGNER=$(find /usr /opt /root /var -name "apksigner" 2>/dev/null | head -n 1)
-          if [ -n "$APK_SIGNER" ]; then
-            ANDROID_DIR=$(echo "$APK_SIGNER" | sed -E 's|/build-tools/.*||')
-          else
-            ANDROID_DIR="/usr/lib/android-sdk"
-          fi
-          
-          echo "Found Java at: $JAVA_DIR"
-          echo "Found Android SDK at: $ANDROID_DIR"
-
-          python3 -c "
-import os
-
-java_dir = '$JAVA_DIR'
-android_dir = '$ANDROID_DIR'
-keystore = '$GITHUB_WORKSPACE/debug.keystore'
-home_dir = os.environ.get('HOME', '/github/home')
-
-content = f'''[gd_resource type=\"EditorSettings\" format=3]
-
-[resource]
-export/android/android_sdk_path = \"{android_dir}\"
-export/android/java_sdk_path = \"{java_dir}\"
-export/android/debug_keystore = \"{keystore}\"
-export/android/debug_keystore_user = \"androiddebugkey\"
-export/android/debug_keystore_pass = \"android\"
-'''
-
-for target_dir in [f'{home_dir}/.config/godot', '/root/.config/godot']:
-    os.makedirs(target_dir, exist_ok=True)
-    with open(f'{target_dir}/editor_settings-4.tres', 'w') as f:
-        f.write(content)
-print('EditorSettings successfully written!')
-"
+          python3 scripts/setup_ci.py
 
       - name: Create Build Directory
-        run: |
-          mkdir -p build/
+        run: mkdir -p build/
 
       - name: Export APK with Godot
-        run: |
-          godot -v --headless --export-debug "Android" build/Firefight.apk
+        run: godot -v --headless --export-debug "Android" build/Firefight.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
