@@ -11,6 +11,20 @@ JAVA_DIR=$(dirname $(dirname "$JAVA_REAL"))
 ANDROID_DIR="${ANDROID_HOME:-/usr/lib/android-sdk}"
 KEYSTORE="$HOME_DIR/debug.keystore"
 
+# Ensure Android build-tools 34 compatibility for Godot 4.3
+if [ -d "$ANDROID_DIR/build-tools/33.0.2" ] && [ ! -d "$ANDROID_DIR/build-tools/34.0.0" ]; then
+  ln -s "$ANDROID_DIR/build-tools/33.0.2" "$ANDROID_DIR/build-tools/34.0.0" || true
+fi
+if [ -d "$ANDROID_DIR/platforms/android-33" ] && [ ! -d "$ANDROID_DIR/platforms/android-34" ]; then
+  ln -s "$ANDROID_DIR/platforms/android-33" "$ANDROID_DIR/platforms/android-34" || true
+fi
+
+# Try sdkmanager if available
+if which sdkmanager >/dev/null 2>&1; then
+  yes | sdkmanager --licenses >/dev/null 2>&1 || true
+  sdkmanager "build-tools;34.0.0" "platforms;android-34" >/dev/null 2>&1 || true
+fi
+
 # Copy keystore to HOME and root
 cp debug.keystore "$HOME_DIR/debug.keystore" 2>/dev/null || true
 cp debug.keystore /root/debug.keystore 2>/dev/null || true
