@@ -9,7 +9,11 @@ JAVA_BIN=$(which java 2>/dev/null || echo "/usr/bin/java")
 JAVA_REAL=$(readlink -f "$JAVA_BIN" 2>/dev/null || echo "$JAVA_BIN")
 JAVA_DIR=$(dirname $(dirname "$JAVA_REAL"))
 ANDROID_DIR="${ANDROID_HOME:-/usr/lib/android-sdk}"
-KEYSTORE="${GITHUB_WORKSPACE:-.}/debug.keystore"
+KEYSTORE="$HOME_DIR/debug.keystore"
+
+# Copy keystore to HOME and root
+cp debug.keystore "$HOME_DIR/debug.keystore" 2>/dev/null || true
+cp debug.keystore /root/debug.keystore 2>/dev/null || true
 
 echo "Configuring Godot CI:"
 echo "  Java Home: $JAVA_DIR"
@@ -35,12 +39,15 @@ mkdir -p "$HOME_DIR/.local/share/godot/export_templates/4.3.stable"
 mkdir -p "$HOME_DIR/.local/share/godot/templates/4.3.stable"
 mkdir -p /root/.local/share/godot/export_templates/4.3.stable
 
-for d in /root/.local/share/godot/templates/4.3.stable /root/.local/share/godot/export_templates/4.3.stable; do
+for d in /root/.local/share/godot/templates/4.3.stable /root/.local/share/godot/export_templates/4.3.stable /usr/local/share/godot/templates/4.3.stable; do
   if [ -d "$d" ]; then
     cp -rn "$d"/* "$HOME_DIR/.local/share/godot/export_templates/4.3.stable/" 2>/dev/null || true
     cp -rn "$d"/* "$HOME_DIR/.local/share/godot/templates/4.3.stable/" 2>/dev/null || true
     cp -rn "$d"/* /root/.local/share/godot/export_templates/4.3.stable/ 2>/dev/null || true
   fi
 done
+
+echo "Template contents in $HOME_DIR:"
+ls -la "$HOME_DIR/.local/share/godot/export_templates/4.3.stable/" || true
 
 echo "CI Environment Configured Successfully!"
