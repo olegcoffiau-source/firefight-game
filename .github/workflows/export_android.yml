@@ -41,28 +41,45 @@ jobs:
             fi
           done
 
-          # Setup Godot Editor Settings for Android SDK & Java SDK
-          mkdir -p "$HOME/.config/godot/"
-          mkdir -p /root/.config/godot/
+          # Dynamically detect Java and Android SDK paths
+          JAVA_BIN=$(which javac 2>/dev/null || which java 2>/dev/null || echo "/usr/bin/javac")
+          JAVA_REAL=$(readlink -f "$JAVA_BIN")
+          JAVA_DIR=$(dirname $(dirname "$JAVA_REAL"))
+          
+          APK_SIGNER=$(find /usr /opt /root /var -name "apksigner" 2>/dev/null | head -n 1)
+          if [ -n "$APK_SIGNER" ]; then
+            ANDROID_DIR=$(echo "$APK_SIGNER" | sed -E 's|/build-tools/.*||')
+          else
+            ANDROID_DIR="/usr/lib/android-sdk"
+          fi
+          
+          echo "Found Java at: $JAVA_DIR"
+          echo "Found Android SDK at: $ANDROID_DIR"
 
-          JAVA_BIN=$(which java 2>/dev/null || echo "/usr/bin/java")
-          JAVA_REAL=$(readlink -f "$JAVA_BIN" 2>/dev/null || echo "$JAVA_BIN")
-          JAVA_HOME_DIR=$(dirname $(dirname "$JAVA_REAL"))
-          ANDROID_PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/lib/android/sdk}}"
+          python3 -c "
+import os
 
-          cat << 'EOF' > "$HOME/.config/godot/editor_settings-4.tres"
-          [gd_resource type="EditorSettings" format=3]
+java_dir = '$JAVA_DIR'
+android_dir = '$ANDROID_DIR'
+keystore = '$GITHUB_WORKSPACE/debug.keystore'
+home_dir = os.environ.get('HOME', '/github/home')
 
-          [resource]
-          export/android/android_sdk_path = "/usr/lib/android/sdk"
-          export/android/java_sdk_path = "/usr/lib/jvm/default-java"
-          export/android/debug_keystore = "debug.keystore"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
-          EOF
-          sed -i 's/^[ \t]*//' "$HOME/.config/godot/editor_settings-4.tres"
+content = f'''[gd_resource type=\"EditorSettings\" format=3]
 
-          cp "$HOME/.config/godot/editor_settings-4.tres" /root/.config/godot/editor_settings-4.tres || true
+[resource]
+export/android/android_sdk_path = \"{android_dir}\"
+export/android/java_sdk_path = \"{java_dir}\"
+export/android/debug_keystore = \"{keystore}\"
+export/android/debug_keystore_user = \"androiddebugkey\"
+export/android/debug_keystore_pass = \"android\"
+'''
+
+for target_dir in [f'{home_dir}/.config/godot', '/root/.config/godot']:
+    os.makedirs(target_dir, exist_ok=True)
+    with open(f'{target_dir}/editor_settings-4.tres', 'w') as f:
+        f.write(content)
+print('EditorSettings successfully written!')
+"
 
       - name: Create Build Directory
         run: |
