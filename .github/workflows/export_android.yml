@@ -70,8 +70,11 @@ jobs:
           sed -i "s|\$HOME|$HOME|g" ~/.config/godot/editor_settings-4.tres
           cat ~/.config/godot/editor_settings-4.tres
 
-      - name: Import Godot Project
-        run: godot --headless --editor --quit || true
+      - name: Import Godot Project & Install Android Build Template
+        run: |
+          mkdir -p build
+          godot --headless --editor --quit || true
+          godot --headless --android-install-build-template || true
 
       - name: Export Android APK
         run: godot -v --headless --export-debug "Android" build/Firefight.apk
