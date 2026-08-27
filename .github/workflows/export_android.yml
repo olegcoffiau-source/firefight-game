@@ -26,7 +26,7 @@ jobs:
           fi
           cp debug.keystore /root/.android/debug.keystore || true
           cp debug.keystore "$HOME/.android/debug.keystore" || true
-          python3 scripts/setup_ci.py
+          sh scripts/setup_ci.sh
 
       - name: Create Build Directory
         run: mkdir -p build/
